@@ -1,26 +1,24 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <style>
-body{
-  background:#fafafa; 
-}
+  body{
+    background:#fafafa; 
+  }
 
-.axis{
-  stroke: #ddd;
-  stroke-width: 1;
-}
+  .axis{
+    stroke: #ddd;
+    stroke-width: 1;
+  }
 
-.arc text {
-  /*font: 10px helvetica;*/
+  .arc text {
+    font: 10px Circular Std;
+    text-anchor: middle;
+  }
 
-  font: 10px Circular Std;
-  text-anchor: middle;
-}
-
-.line {
-  fill: none;
-  stroke-width: 2px;
-}
+  .line {
+    fill: none;
+    stroke-width: 2px;
+  }
 
   button {
     width: 4em;
@@ -35,85 +33,59 @@ body{
     left: 290px;
   }
 
-  #range {
-    font: 15px sans-serif;
-    margin-left: -10px;
+  .tooltip{
     position: absolute;
-    left: 250px;
-    top: 695px;
+    border-radius: 10px;
+    text-align: center;
+    background: #f1f1f1;
+    border: #fdfdfd solid 1px;
+    font-size: 12.5px;
+    vertical-align: middle;
   }
 
-  input[type='range'] {
-    -webkit-appearance: none !important;
-    -webkit-border-radius: 5px;
-    background-color: #bbb;
-    height: 10px;
-    width: 200px;
-    position: absolute;
-    top: 700px;
-    left:20px;
+  #legend{
+    position:absolute;
+    left: 0px;
+    top: 310px;
   }
 
-.tooltip{
-  position: absolute;
-  border-radius: 10px;
-  text-align: center;
-  background: #f1f1f1;
-  border: #fdfdfd solid 1px;
-  font-size: 12.5px;
-  vertical-align: middle;
-}
+  .legend-icon{
+    position:absolute;
+    left: 0px;
+    top: 0px;
+    width: 10px;
+    height: 30px;
+    border-radius: 5px;
+    border: #eee solid 1px;
+  }
 
-#legend{
-  position:absolute;
-  left: 0px;
-  top: 310px;
-}
+  .legend{
+    position: absolute;
+    left: 5px;
+    top: 397px;
+    width: 780px;
+    border-radius: 5px;
+  }
 
-.legend-icon{
-  position:absolute;
-  left: 0px;
-  top: 0px;
-  width: 10px;
-  height: 30px;
-  border-radius: 5px;
-  border: #eee solid 1px;
-}
-
-.legend{
-  position: absolute;
-  left: 5px;
-  top: 397px;
-  width: 780px;
-/*  top: 410px;
-  width: 440px;*/
-  border-radius: 5px;
-  /*border: #eee solid 1px;*/
-}
-
-.legend1, .legend2, .legend3, .legend4, .legend5, .legend6, .legend7, .legend8{
-  position:absolute;
-  left: 0px;
-  top: 0px;
-  width: 10px;
-  height: 30px;
-  border-radius: 5px;
-  border: #eee solid 1px;
-  display: none;
-}
+  .legend1, .legend2, .legend3, .legend4, .legend5, .legend6, .legend7, .legend8{
+    position:absolute;
+    left: 0px;
+    top: 0px;
+    width: 10px;
+    height: 30px;
+    border-radius: 5px;
+    border: #eee solid 1px;
+    display: none;
+  }
 
 .stack{
-  /*width: 300px;*/
   position: absolute;
- /* left: 20px;
-  top: 300px;*/
 }
 
 </style>
 
-  <svg id="svg" width="1540" height="757">
+  <svg id="svg" width="1540" height="757"></svg>
 
-  </svg>
   <div class="tooltip"></div>
 
   <div id="overlay2"></div>
@@ -133,6 +105,7 @@ body{
 
 <script>
 
+  // parameter to ensure the timeline animation plays and only plays once when being refreshed or launched
   var isPlayed = false;
 
   var svg = d3.selectAll("svg"),
@@ -140,7 +113,8 @@ body{
       height = +svg.attr("height"),
       g = svg.append("g").attr("transform", "translate(" + 65 + "," + 125 + ")");
 
-  //consecutive ones -> subtle difference
+
+  // color code computation using hsl model
   var color_array = [];
   for (var j =1; j<=8; j++){
     var h = j/8 + 0.04-0.125; //0.75
@@ -154,6 +128,7 @@ body{
     var hex = c.toString(16);
     return hex.length == 1 ? "0" + hex : hex;
   }
+
   function rgbToHex(r, g, b) {
     return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
   }
@@ -162,6 +137,7 @@ body{
     return color_array[mood-1];
   }
 
+  // add subtle difference in color coding for consecutive bubbles 
   function randomcolor(mood,time){
     var s = 0.78*(1+Math.pow(-1,Math.floor(time/4))*time%3/40);
     var i = 0.58*(1+Math.pow(-1,Math.floor(time/3))*time%4/30);
@@ -170,6 +146,8 @@ body{
     return thiscolor;
   }
 
+
+  // define the global parameters/functions that are called by drawings & animations
   var x = d3.scale.linear()
       .range([15, 277]);
 
@@ -200,6 +178,7 @@ body{
       .innerRadius(0);
 
 
+  // initialize the animation parameters
   var tInit = performance.now();
 
   var t = new Date().getTime();
@@ -210,6 +189,7 @@ body{
   requestAnimationFrame(animate);
 
 
+  // define the animations per visual elements
   function animate () {
 
     t = new Date().getTime();
@@ -218,6 +198,8 @@ body{
     elapsedTime2 += dt / DURATION *10;
     lt = t;
 
+    // natural popping bubbles
+    // changing radius using perlin noise
     area_p = d3.svg.area()
     .interpolate("basis")
     .x(function(d) { return x(d.timestamp); })
@@ -230,7 +212,8 @@ body{
       * Math.ceil(d.timestamp/8)*2.6+0.5;
     });
 
-    //natural river movement along with time
+    // natural river wave
+    // changing boundary pixel per layer using perlin noise
     path = d3.arc()
       .outerRadius(function(d){
         var this_radius = 5+Math.round(radius/48*Math.sqrt(d.data.calories));
@@ -250,6 +233,8 @@ body{
         return area_p(d.values);
     });
 
+    // draw the textures representing nutritional on the bubbles
+    // invisible when not being highlighted
     d3.selectAll(".texture-1").attr("d", path);
     d3.selectAll(".texture-2").attr("d", path);
     d3.selectAll(".texture-3").attr("d", path);
@@ -261,19 +246,24 @@ body{
 
   }
 
+  // position X axis along with timeline (dates)
   function cal_X(timestamp, day){
     var tx =  60*(day-1) -35;
     return tx;
   }
 
+  // position Y axis along with time per day (breafast/lunch/dinner)
+  // tiny offset added to make the layout less dull
   function cal_Y(mood, meal){
-    // var ty = mood*32-110;
     var ty = meal*105 + mood*2 -182;
     return ty;
   }
 
+  // Molecule View 
+  // the major function to draw the bubbles and the timeline layout
   function drawEle(){
 
+    // draw the horizontal lines as X asis
     for(var i=2; i<=4; i++){
       g.append("line")
         .attr("class","axis")
@@ -284,20 +274,22 @@ body{
         .attr("y2",function(){return 88*i+15*(i-2)-195;});
     }
 
-    d3.csv("data2.csv", function(d) {
+    // load Lee's data
+    d3.csv("dataLee.csv", function(d) {
       return d;
     }, function(error, data) {
+      
       var timestamp = 0;
       var tx =0, ty =0;
 
+      var range = data.map(function(d){ d.value = +d["Calories"]; return d; });
 
-    var range = data.map(function(d){ d.value = +d["Calories"]; return d; });
-
+      // process per data entry
       for (var i=1; i<=data.length; i++){
 
         var data_temp = data[timestamp];
 
-        var data_temp = data[timestamp];
+        // re-put the data metrics into a new structure
         var data_pie=[
           {"mood":data_temp.mood,"calories":data_temp.Calories,"nutrition":"Carbs", "number":data_temp.Carbs, 
             "keyword": data_temp.Keyword, "timestamp":timestamp, "mealidx":data_temp.meal, "dayidx":data_temp.day},
@@ -310,11 +302,13 @@ body{
           {"mood":data_temp.mood,"calories":data_temp.Calories,"nutrition":"Sodium", "number":data_temp.Sodium/1000,"keyword": data_temp.Keyword, "timestamp":timestamp, "mealidx":data_temp.meal, "dayidx":data_temp.day}
         ];
 
-        tx = cal_X(timestamp,data_temp.day);
-        ty = cal_Y(data_temp.mood,data_temp.meal);
+        // calculate the coordinates based on date(X) & meal(Y) index
+        tx = cal_X(timestamp, data_temp.day);
+        ty = cal_Y(data_temp.mood, data_temp.meal);
 
         if (error) throw error;
 
+        // draw the bubbles
         var arc = g.selectAll(".arc")
           .data(pie(data_pie))
           .enter().append("g")
@@ -322,17 +316,21 @@ body{
             .attr("transform", "translate(" + tx + "," + ty + ")")
             .on("mouseover", function(d){
 
+              // when hovering, call the functions to draw RoseViz
               var transform = d3.select(this).attr("transform");
 
               drawTag(d.data,transform,data.length);
+
               var this_timestamp = this.className.baseVal.substring(3);
+
               drawThisRing(data[this_timestamp],transform,data.length);
 
               var stone = d3.transform(d3.select(this).attr("transform"));
               stone = stone.translate[0];
-              // var mood_stone = d.data.mood;
 
+              // reposition the other bubbles by repelling => relayout to reduce visual clutter
               for (var j=1; j<=data.length; j++){
+                // traverse all bubbles, no change on the hovered one
                 if(j==this_timestamp){
                   d3.selectAll(".arc"+j)
                       .transition()
@@ -344,6 +342,7 @@ body{
                   continue;
                 }
                 else{
+                  // repel the bubbles to the left/right further left/right
                   d3.selectAll(".arc"+j)
                       .transition()
                       .duration(1000)
@@ -351,7 +350,6 @@ body{
                       .attr("transform",function(d){
                         var t = d3.transform(d3.select(this).attr("transform"));
                           if(j<this_timestamp)
-                            // var newX = (width-600)/48 * j -35;
                             var newX = t.translate[0] - 3*j;
                           else
                             var newX = t.translate[0] + 3*(46-j);
@@ -362,15 +360,16 @@ body{
               }
             });
 
+        // append the textures on bubbles if needed
         arc.append("path")
-            .attr("class",function(d){return "texture-"+d.data.mood;})
-            .attr("d", path)
-            .attr("stroke", function(d) {
-              return randomcolor(d.data.mood,timestamp)
-            })
-            .attr("fill", function(d) {
-              return randomcolor(d.data.mood,timestamp)
-            });
+          .attr("class",function(d){return "texture-"+d.data.mood;})
+          .attr("d", path)
+          .attr("stroke", function(d) {
+            return randomcolor(d.data.mood,timestamp)
+          })
+          .attr("fill", function(d) {
+            return randomcolor(d.data.mood,timestamp)
+          });
 
         timestamp ++;
       }
@@ -379,16 +378,18 @@ body{
 
   } 
 
-  // smoothly pop up
+  // draw the elements (tagcloud & photo) inside the RoseViz
   function drawTag(data, transform, _length){
 
       var keyword = data.keyword;
       var length = keyword.split("-").length;
 
+      // if the previous rose not vanished yet (due to bug/delay etc.), remove it
       d3.selectAll(".tags").remove();
       d3.selectAll(".tagBg").remove();
       d3.selectAll(".tagimg").remove();
 
+      // append the background of tagcloud area first
       svg.append("g")
         .append("circle")
         .attr("class","tagBg")
@@ -398,6 +399,7 @@ body{
         .attr("r", 1)
         .attr("fill","#fcfcfc");
 
+      // make the background appear smoothly
       d3.selectAll(".tagBg")
         .transition()
         .duration(700)
@@ -406,6 +408,7 @@ body{
 
         d3.selectAll(".tagBg")
         .on("click",function(){
+          // when the tagcloud area is clicked, overlay the image of meal over the tagcloud if image exists
           $( ".tooltip" ).animate({
                 opacity: 0
               }, 500, function() {
@@ -417,12 +420,15 @@ body{
               .css("height","0px").css("line-height","0px").css("width","0px").text("");
               
           var time = data.timestamp+1;
+
           var status  = imageExists("lee-tag/"+time+".png");
 
+          // if image doesn't exist, simply no response and do not move forward to draw it
           if(!status)
             return;
 
-            svg.append("g")
+          // if image exists, draw it out
+          svg.append("g")
             .append("svg:image")
             .attr('x',25)
             .attr('y',85)
@@ -433,6 +439,7 @@ body{
             .attr("xlink:href","lee-tag/"+time+".png")
             .style("opacity",0)
             .on("click",function(){
+              // when the image get clicked, first pop it up then smoothly disappear
               d3.selectAll(".tagimg")
               .transition()
               .duration(600)
@@ -463,9 +470,11 @@ body{
             .style("opacity",1);
         });
 
+      
+      // draw the tagcloud
+      // layout & set fonts according to #tags    
       var fonts = 14;
       for(var i = 0; i<length; i++){
-        // alert(keyword.split("-")[i]);
         svg.append("g").append("text").attr("class","tags")
         .attr("x",function(){
           if(length<2)
@@ -488,7 +497,7 @@ body{
 
         })
         .attr("transform", transform)
-        .style("font-size","0.5px")//.attr("fill","#fff")
+        .style("font-size","0.5px")
         .style("opacity",0)
         .attr("fill",function(){return color(data.mood);})
         .text(function(){return keyword.split("-")[i]});
@@ -502,10 +511,14 @@ body{
       }
   }
 
+
+  // RoseViz View 
+  // the major function to draw the rose
   function drawThisRing(data_temp,transform,length){
 
+    // if the previous rose not vanished yet (due to bug/delay etc.), remove it
     d3.selectAll(".ring_temp").remove();
-    // var Total = data_temp.Carbs*1+ data_temp.Fat*1+ data_temp.Fiber*1+ data_temp.Protein*1+ data_temp.Sodium/1000;
+
     var Total = data_temp.Calories;
     var data_pie=[
       {"mood":data_temp.mood,"nutrition":"Carbs", "number":data_temp.Carbs,"dayidx":data_temp.day,
@@ -530,6 +543,7 @@ body{
           .attr("class", "ring_temp")
           .attr("transform", transform);
     
+    // draw the textures of components using tiled self-designed glyphs
     ringThis.append("path")
         .attr("class","ringpath")
         .attr("d", path_ring)
@@ -540,6 +554,7 @@ body{
         var glyph_s; 
         var scaler=140;
 
+          // call different glyph according to the component
           switch(d.data.nutrition){
 
             case 'Carbs':
@@ -589,14 +604,14 @@ body{
           }
         })
         .on("mouseover", function(d){
+
+          // call the text legend to title the hovered component area
           var offsetX = 0;
           var offsetY = 0;
           if(d3.event.pageX - transform.split("(")[1].split(",")[0]<=90) offsetX = -110;
             else offsetX = 25;
           if(d3.event.pageY - transform.split(")")[0].split(",")[1]<=90) offsetY = -35;
             else offsetY = 10;
-
-          // console.log(d.data);
 
           if(ringThis.selectAll("path").attr("stroke-opacity")>0.9){
             $(".tooltip").css("left", (d3.event.pageX+offsetX) + "px").css("top", (d3.event.pageY+offsetY)+"px")
@@ -610,6 +625,10 @@ body{
           }
         })
         .on("mouseout", function(d){
+
+          // detect if mouse totally leaves the rose area
+          // Y -> vanish the rose (remove all elements)
+          //      and relayout other bubbles to their original positions
 
           var ra = Math.pow(Math.abs(d3.mouse(this)[0]),2);
           var rb = Math.pow(Math.abs(d3.mouse(this)[1]),2);
@@ -677,6 +696,7 @@ body{
         });
 
 
+    // calculate the radius per petal
     path_ring = d3.arc()
         .outerRadius(function (d) { 
           if(Total<400)
@@ -694,75 +714,89 @@ body{
         .attr("stroke-opacity", 1);
   }
 
-function chart(csvpath) {
 
-  var strokecolor = color_array[0];
+  // the StreamGraph / River View 
+  // the major function to draw the Streamgraph and relevant interactions
+  function chart(csvpath) {
 
-  var stack = d3.layout.stack()
-      .offset("silhouette")
-      .values(function(d) { return d.values; })
-      .x(function(d) { return d.timestamp; })
-      .y(function(d) { return d.value; });
+    var strokecolor = color_array[0];
 
-  var nest = d3.nest()
-      .key(function(d) { return d.mood; });
+    // transform the original data to stacks
+    var stack = d3.layout.stack()
+        .offset("silhouette")
+        .values(function(d) { return d.values; })
+        .x(function(d) { return d.timestamp; })
+        .y(function(d) { return d.value; });
 
-  var area = d3.svg.area()
-      // .interpolate("cardinal")
-      .interpolate("basis")
-      .x(function(d) { return x(d.timestamp); })
-      .y0(function(d) { return y(d.y0); })
-      .y1(function(d) { return y(d.y0 + d.y); });
+    // transform the stacks to layer parameters (e.g. y0, y1,...)
+    var nest = d3.nest()
+        .key(function(d) { return d.mood; });
 
-  var graph = d3.csv(csvpath, function(data) {
-    data.forEach(function(d) {
-      d.timestamp = d.timestamp;
-        d.value = +d.Calories;
-    });
+    // define the area by transporting parameters
+    var area = d3.svg.area()
+        // .interpolate("cardinal")
+        .interpolate("basis")
+        .x(function(d) { return x(d.timestamp); })
+        .y0(function(d) { return y(d.y0); })
+        .y1(function(d) { return y(d.y0 + d.y); });
 
-    var layers = stack(nest.entries(data));
 
-    x.domain(d3.extent(data, function(d) { return d.timestamp; }));
-    y.domain([0, d3.max(data, function(d) { return d.y0 + d.y; })]);    
+    // function to load data and draw the Streamgraph
+    var graph = d3.csv(csvpath, function(data) {
+      data.forEach(function(d) {
+        d.timestamp = d.timestamp;
+          d.value = +d.Calories;
+      });
 
-    svg.selectAll(".layer")
-        .data(layers)
-      .enter().append("path")
-        .attr("class", "layer")
-        .attr("d", function(d) { return area(d.values); })
-        .style("fill", function(d) {return color(d.key); })
-        .on("mouseover",function(d){
-          drawStack(d.key);
+      var layers = stack(nest.entries(data));
 
-          d3.selectAll(".ring_temp").remove();
-          d3.selectAll(".tags").remove();
-          d3.selectAll(".tagimg").remove();
-          d3.selectAll(".tagBg").remove();
-          $( ".tooltip" ).animate({
-                opacity: 0
-              }, 500, function() {
-              $( ".tooltip" ).text("");
-              $(".tooltip").css("left", "0px").css("top", "0px").css("opacity",0)
-              .css("height","0px").css("line-height","0px").css("width","0px");
-            });
-          $(".tooltip").delay(500).css("left", "0px").css("top", "0px").css("opacity",0)
-              .css("height","0px").css("line-height","0px").css("width","0px").text("");
+      x.domain(d3.extent(data, function(d) { return d.timestamp; }));
+      y.domain([0, d3.max(data, function(d) { return d.y0 + d.y; })]);    
 
-          d3.select(this)
-          .transition()
-          .duration(300)
-          .attr("stroke","#fff")
-          .attr("stroke-width","3px");
+      svg.selectAll(".layer")
+          .data(layers)
+        .enter().append("path")
+          .attr("class", "layer")
+          .attr("d", function(d) { return area(d.values); })
+          .style("fill", function(d) {return color(d.key); })
+          .on("mouseover",function(d){
+            // draw the Stacked Rose Map with the selected mood category highlighted
+            drawStack(d.key);
 
-          d3.selectAll(".layer")
-          .transition()
-          .duration(300)
-          .attr("opacity",0.8);
+          // if previous rose did not vanished yet, remove it
+          // possible if the river is too close to the rose (distance < radius area)
+            d3.selectAll(".ring_temp").remove();
+            d3.selectAll(".tags").remove();
+            d3.selectAll(".tagimg").remove();
+            d3.selectAll(".tagBg").remove();
 
-          d3.select(this)
-          .transition()
-          .duration(300)
-          .attr("opacity",1);
+            $( ".tooltip" ).animate({
+                  opacity: 0
+                }, 500, function() {
+                $( ".tooltip" ).text("");
+                $(".tooltip").css("left", "0px").css("top", "0px").css("opacity",0)
+                .css("height","0px").css("line-height","0px").css("width","0px");
+              });
+            $(".tooltip").delay(500).css("left", "0px").css("top", "0px").css("opacity",0)
+                .css("height","0px").css("line-height","0px").css("width","0px").text("");
+
+            // highlight the selected layer by appending stroke and changing opacity
+            d3.select(this)
+            .transition()
+            .duration(300)
+            .attr("stroke","#fff")
+            .attr("stroke-width","3px");
+
+            d3.selectAll(".layer")
+            .transition()
+            .duration(300)
+            .attr("opacity",0.8);
+
+            d3.select(this)
+            .transition()
+            .duration(300)
+            .attr("opacity",1);
+
 
             for (var j=0; j<length; j++){
               d3.selectAll(".arc"+j)
@@ -771,111 +805,112 @@ function chart(csvpath) {
                   .ease(d3.easePolyInOut)
                   .attr("transform",function(d){
                     var t = d3.transform(d3.select(this).attr("transform"));
-                    console.log(d.data.dayidx);
-                    // var newx = (width-560)/48 * j + 22*(d.data.dayidx-1) -35
                     var newx = 60*(d.data.dayidx-1) -35;
                     return "translate(" +newx+","+t.translate[1]+")";
                   });
             }
 
-          d3.selectAll(".texture-"+d.key)
-          .transition()
-          .duration(300)
-          .attr("id","selected")
-          .attr("stroke","#333")
-          .attr("fill", function(d) {
-          
-          // define the textures
-        {
-          // console.log(d.data);
-          var scaler = 19;
-          var t1 = svg.append("defs").append("pattern").attr("id","fiber")
-                .attr("patternUnits","userSpaceOnUse").attr("width",scaler).attr("height",scaler)
-                .append("image").attr("xlink:href","texture/fiber"+d.data.mood+".png")
-                .attr("width",scaler).attr("height",scaler);//.style("opacity", 0.95);
-          var t2 = svg.append("defs").append("pattern").attr("id","sodium")
-                .attr("patternUnits","userSpaceOnUse").attr("width",scaler).attr("height",scaler)
-                .append("image").attr("xlink:href","texture/sodium"+d.data.mood+".png")
-                .attr("width",scaler).attr("height",scaler);//.style("opacity", 0.95);
-          var t3 = svg.append("defs").append("pattern").attr("id","protein")
-                .attr("patternUnits","userSpaceOnUse").attr("width",scaler).attr("height",scaler)
-                .append("image").attr("xlink:href","texture/protein"+d.data.mood+".png")
-                .attr("width",scaler).attr("height",scaler);//.style("opacity", 0.95);
-          var t4 = svg.append("defs").append("pattern").attr("id","carb")
-                .attr("patternUnits","userSpaceOnUse").attr("width",scaler).attr("height",scaler)
-                .append("image").attr("xlink:href","texture/carb"+d.data.mood+".png")
-                .attr("width",scaler).attr("height",scaler);//.style("opacity", 0.95);
-          var t5 = svg.append("defs").append("pattern").attr("id","fat")
-                .attr("patternUnits","userSpaceOnUse").attr("width",scaler).attr("height",scaler)
-                .append("image").attr("xlink:href","texture/fat"+d.data.mood+".png")
-                .attr("width",scaler).attr("height",scaler);//.style("opacity", 0.95);
-        }
+            // highlight all the bubbles of the selected mood category
+            // call their textures to appear
+            d3.selectAll(".texture-"+d.key)
+            .transition()
+            .duration(300)
+            .attr("id","selected")
+            .attr("stroke","#333")
+            .attr("fill", function(d) {
+            
+            // define the textures
+            var scaler = 19;
+            var t1 = svg.append("defs").append("pattern").attr("id","fiber")
+                  .attr("patternUnits","userSpaceOnUse").attr("width",scaler).attr("height",scaler)
+                  .append("image").attr("xlink:href","texture/fiber"+d.data.mood+".png")
+                  .attr("width",scaler).attr("height",scaler);//.style("opacity", 0.95);
+            var t2 = svg.append("defs").append("pattern").attr("id","sodium")
+                  .attr("patternUnits","userSpaceOnUse").attr("width",scaler).attr("height",scaler)
+                  .append("image").attr("xlink:href","texture/sodium"+d.data.mood+".png")
+                  .attr("width",scaler).attr("height",scaler);//.style("opacity", 0.95);
+            var t3 = svg.append("defs").append("pattern").attr("id","protein")
+                  .attr("patternUnits","userSpaceOnUse").attr("width",scaler).attr("height",scaler)
+                  .append("image").attr("xlink:href","texture/protein"+d.data.mood+".png")
+                  .attr("width",scaler).attr("height",scaler);//.style("opacity", 0.95);
+            var t4 = svg.append("defs").append("pattern").attr("id","carb")
+                  .attr("patternUnits","userSpaceOnUse").attr("width",scaler).attr("height",scaler)
+                  .append("image").attr("xlink:href","texture/carb"+d.data.mood+".png")
+                  .attr("width",scaler).attr("height",scaler);//.style("opacity", 0.95);
+            var t5 = svg.append("defs").append("pattern").attr("id","fat")
+                  .attr("patternUnits","userSpaceOnUse").attr("width",scaler).attr("height",scaler)
+                  .append("image").attr("xlink:href","texture/fat"+d.data.mood+".png")
+                  .attr("width",scaler).attr("height",scaler);//.style("opacity", 0.95);
 
-          switch(d.data.nutrition){
+            switch(d.data.nutrition){
 
-            case 'Carbs':
-              return "url(#carb)";
-              break;
+              case 'Carbs':
+                return "url(#carb)";
+                break;
 
-            case 'Fat':
-              return "url(#fat)";
-              break;
+              case 'Fat':
+                return "url(#fat)";
+                break;
 
-            case 'Fiber':
-              return "url(#fiber)";
-              break;
+              case 'Fiber':
+                return "url(#fiber)";
+                break;
 
-            case 'Protein':
-              return "url(#protein)";
-              break;
+              case 'Protein':
+                return "url(#protein)";
+                break;
 
-            case 'Sodium':
-              return "url(#sodium)";
-              break;
-          }
-          });
-        })
-        .on("mouseout",function(d){
-          d3.selectAll(".stack"+d.key)
-                .transition()
-                .delay(300)
-                .duration(500)
-                .style("opacity",0);
-          setTimeout(function(){
-            d3.selectAll(".stack"+d.key).remove()
-          },800);
-
-          d3.select(this)
-          .transition()
-          .duration(300)
-          .attr("stroke","none");
-
-          d3.selectAll(".layer")
-          .transition()
-          .duration(300)
-          .attr("opacity",1);
-
-          d3.selectAll("#selected")
-          .transition()
-          .duration(300)
-          .attr("id",null)
-          .attr("stroke",function(d) {
-              return color(d.data.mood);
+              case 'Sodium':
+                return "url(#sodium)";
+                break;
+            }
+            });
           })
-          .attr("fill", function(d) {
-              return color(d.data.mood);
+          .on("mouseout",function(d){
+            // let the Stacked Rose disappear
+            d3.selectAll(".stack"+d.key)
+              .transition()
+              .delay(300)
+              .duration(500)
+              .style("opacity",0);
+
+            setTimeout(function(){
+              d3.selectAll(".stack"+d.key).remove()
+            },800);
+
+            // remove the highlight effects
+            d3.select(this)
+            .transition()
+            .duration(300)
+            .attr("stroke","none");
+
+            d3.selectAll(".layer")
+            .transition()
+            .duration(300)
+            .attr("opacity",1);
+
+            d3.selectAll("#selected")
+            .transition()
+            .duration(300)
+            .attr("id",null)
+            .attr("stroke",function(d) {
+                return color(d.data.mood);
+            })
+            .attr("fill", function(d) {
+                return color(d.data.mood);
+            });
           });
-        });
 
-    svg.selectAll(".layer")
-      .transition()
-      .duration(300)
-      .attr("opacity", 1);
-  });
-}
+      svg.selectAll(".layer")
+        .transition()
+        .duration(300)
+        .attr("opacity", 1);
+    });
+  }
 
-// var rflag = false;
-function drawStack(key){
+
+  // Stacked Rose Diagram
+  function drawStack(key){
     svg.append("g")
       .append("svg:image")
       .attr("x",10)
@@ -887,17 +922,19 @@ function drawStack(key){
       .transition()
       .duration(800)
       .style("opacity",1);
-}
+  }
 
-  chart("data3_sum.csv");
+
+  // major flow of functions
+  chart("dataLee_sum.csv");
   drawEle();
-  // drawStack();
   if(!isPlayed)
     setTimeout(function(){
       loadplay()
     },10);
 
-  //timeline animation
+
+  // timeline animations
   function loadplay()
   {
     d3.select("svg").append("g")
@@ -914,6 +951,7 @@ function drawStack(key){
         maxstep = 46,
         minstep = 0;
 
+    // fade in the river by animating a rect overlay
     d3.select("svg").append("g")
         .append("rect")
         .attr("id","overlay")
@@ -933,6 +971,7 @@ function drawStack(key){
         .attr("x", 1490)
         .attr("width", 10);
 
+    // gradually make the bubbles visible along their date indexes
     for(var i = minstep; i<=46; i++){
       d3.selectAll(".arc"+i)
       .transition()
@@ -955,9 +994,9 @@ function drawStack(key){
       }, duration);
       isPlayed = true
     },500);
-}
+  }
 
-function update(timestamp) {
+  function update(timestamp) {
     for(var i=0; i<=timestamp; i++)
       d3.selectAll(".arc"+i)
         .transition()
@@ -968,10 +1007,10 @@ function update(timestamp) {
       .transition()
       .duration(150)
       .style("opacity",1);    
-}
+  }
 
 
-function hslToRgb ( h, s, l ){
+  function hslToRgb ( h, s, l ){
     
     var r, g, b;
 
@@ -1003,26 +1042,27 @@ function hslToRgb ( h, s, l ){
 
     return [  r,  g,  b ];
 
-}
+  }
 
 
-function hideThisLegend(mood)
-{
-  for(var i =1; i<9; i++)
-    if(i!=mood)
-      $(".legend"+i).css("display","none").css("top","0px").css("left","0px");
+  function hideThisLegend(mood)
+  {
+    for(var i =1; i<9; i++)
+      if(i!=mood)
+        $(".legend"+i).css("display","none").css("top","0px").css("left","0px");
 
+  }
 
-}
+  // the function to test if image exist
+  // return error 404 if not
+  function imageExists(image_url){
 
-function imageExists(image_url){
+      var http = new XMLHttpRequest();
 
-    var http = new XMLHttpRequest();
+      http.open('HEAD', image_url, false);
+      http.send();
 
-    http.open('HEAD', image_url, false);
-    http.send();
-
-    return http.status != 404;
-}
+      return http.status != 404;
+  }
 
 </script>
