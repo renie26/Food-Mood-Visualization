@@ -738,7 +738,7 @@
         .interpolate("basis")
         .x(function(d) { return x(d.timestamp); })
         .y0(function(d) { return y(d.y0); })
-        .y1(function(d) { return y(d.y0 + d.y); });
+        .y1(function(d) { if(d.mood==1) console.log(d.y+" "+d.y0); return y(d.y0 + d.y); });
 
 
     // function to load data and draw the Streamgraph
