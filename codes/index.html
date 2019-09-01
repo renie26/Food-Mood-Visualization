@@ -102,6 +102,7 @@
 <script src="https://d3js.org/d3.v4.min.js"></script>
 
 <script src="js/perlin.js"></script>
+<script src="https://unpkg.com/textures@1.2.0/dist/textures.js"></script>
 
 <script>
 
@@ -255,7 +256,8 @@
   // position Y axis along with time per day (breafast/lunch/dinner)
   // tiny offset added to make the layout less dull
   function cal_Y(mood, meal){
-    var ty = meal*105 + mood*2 -182;
+    // var ty = meal*105 + mood*2 -182;
+    var ty = meal*105 -182;
     return ty;
   }
 
@@ -552,13 +554,15 @@
         .attr("stroke-opacity", 0)
         .attr("fill", function(d) {
         var glyph_s; 
-        var scaler=140;
+        var scaler=160;
 
           // call different glyph according to the component
           switch(d.data.nutrition){
 
             case 'Carbs':
-              glyph_s = Math.sqrt(d.data.number/Total)*scaler;
+              // glyph_s = Math.sqrt(d.data.number/Total)*scaler/3.2;
+              // glyph_s = d.data.number/Total*scaler;
+              glyph_s = 15;
               var t4 = svg.append("defs").append("pattern").attr("id","carb")
                 .attr("patternUnits","userSpaceOnUse").attr("width",glyph_s).attr("height",glyph_s)
                 .append("image").attr("xlink:href","texture/carb"+data_temp.mood+".png")
@@ -567,7 +571,16 @@
               break;
 
             case 'Fat':
-              glyph_s = Math.sqrt(d.data.number/Total)*scaler;
+              // var t = textures.circles()
+              //         .radius(4)
+              //         .fill("transparent")
+              //         .strokeWidth(2);
+              // return "t.url()";
+              // break;
+
+              // glyph_s = Math.sqrt(d.data.number/Total)*scaler/2;
+              // glyph_s = d.data.number/Total*scaler;
+              glyph_s = 15;
               var t5 = svg.append("defs").append("pattern").attr("id","fat")
                 .attr("patternUnits","userSpaceOnUse").attr("width",glyph_s).attr("height",glyph_s)
                 .append("image").attr("xlink:href","texture/fat"+data_temp.mood+".png")
@@ -576,7 +589,9 @@
               break;
 
             case 'Fiber':
-              glyph_s = Math.sqrt(d.data.number/Total)*scaler;
+              // glyph_s = Math.sqrt(d.data.number/Total)*scaler*1.1;
+              // glyph_s = d.data.number/Total*scaler;
+              glyph_s = 20;
               var t1 = svg.append("defs").append("pattern").attr("id","fiber")
                 .attr("patternUnits","userSpaceOnUse").attr("width",glyph_s).attr("height",glyph_s)
                 .append("image").attr("xlink:href","texture/fiber"+data_temp.mood+".png")
@@ -585,7 +600,9 @@
               break;
 
             case 'Protein':
-              glyph_s = Math.sqrt(d.data.number/Total)*scaler;
+              // glyph_s = Math.sqrt(d.data.number/Total)*scaler/2.2;
+              // glyph_s = d.data.number/Total*scaler;
+              glyph_s = 20;
               var t3 = svg.append("defs").append("pattern").attr("id","protein")
                 .attr("patternUnits","userSpaceOnUse").attr("width",glyph_s).attr("height",glyph_s)
                 .append("image").attr("xlink:href","texture/protein"+data_temp.mood+".png")
@@ -594,7 +611,9 @@
               break;
 
             case 'Sodium':
-              glyph_s = Math.sqrt(d.data.number/Total)*scaler;
+              // glyph_s = Math.sqrt(d.data.number/Total)*scaler*1.5;
+              // glyph_s = d.data.number/Total*scaler;
+              glyph_s = 6;
               var t2 = svg.append("defs").append("pattern").attr("id","sodium")
                 .attr("patternUnits","userSpaceOnUse").attr("width",glyph_s).attr("height",glyph_s)
                 .append("image").attr("xlink:href","texture/sodium"+data_temp.mood+".png")
@@ -820,15 +839,16 @@
             .attr("fill", function(d) {
             
             // define the textures
-            var scaler = 19;
+            var scaler = 15;
+            var scaler2 = 8;
             var t1 = svg.append("defs").append("pattern").attr("id","fiber")
                   .attr("patternUnits","userSpaceOnUse").attr("width",scaler).attr("height",scaler)
                   .append("image").attr("xlink:href","texture/fiber"+d.data.mood+".png")
                   .attr("width",scaler).attr("height",scaler);//.style("opacity", 0.95);
             var t2 = svg.append("defs").append("pattern").attr("id","sodium")
-                  .attr("patternUnits","userSpaceOnUse").attr("width",scaler).attr("height",scaler)
+                  .attr("patternUnits","userSpaceOnUse").attr("width",scaler2).attr("height",scaler2)
                   .append("image").attr("xlink:href","texture/sodium"+d.data.mood+".png")
-                  .attr("width",scaler).attr("height",scaler);//.style("opacity", 0.95);
+                  .attr("width",scaler2).attr("height",scaler2);//.style("opacity", 0.95);
             var t3 = svg.append("defs").append("pattern").attr("id","protein")
                   .attr("patternUnits","userSpaceOnUse").attr("width",scaler).attr("height",scaler)
                   .append("image").attr("xlink:href","texture/protein"+d.data.mood+".png")
@@ -917,7 +937,7 @@
       .attr("y",345)
       .attr("width","340px")
       .attr("class","stack"+key)
-      .attr("xlink:href","stack"+key+".png")
+      // .attr("xlink:href","stack"+key+".png")
       .style("opacity",0)
       .transition()
       .duration(800)
