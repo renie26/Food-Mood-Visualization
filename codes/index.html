@@ -169,7 +169,7 @@
           return Math.sqrt(Math.sqrt(d.number));
        });
 
-  var radius = 30;
+  var radius = 30;//35
 
   var path = d3.arc()
       .outerRadius(function(d){ 
@@ -278,6 +278,7 @@
 
     // load Lee's data
     d3.csv("dataLee.csv", function(d) {
+    // d3.csv("dataCrystal.csv", function(d) {
       return d;
     }, function(error, data) {
       
@@ -290,7 +291,7 @@
       for (var i=1; i<=data.length; i++){
 
         var data_temp = data[timestamp];
-
+        console.log(data_temp);
         // re-put the data metrics into a new structure
         var data_pie=[
           {"mood":data_temp.mood,"calories":data_temp.Calories,"nutrition":"Carbs", "number":data_temp.Carbs, 
@@ -308,6 +309,7 @@
         tx = cal_X(timestamp, data_temp.day);
         ty = cal_Y(data_temp.mood, data_temp.meal);
 
+        console.log(data_temp.day +", "+data_temp.meal);
         if (error) throw error;
 
         // draw the bubbles
@@ -757,7 +759,9 @@
         .interpolate("basis")
         .x(function(d) { return x(d.timestamp); })
         .y0(function(d) { return y(d.y0); })
-        .y1(function(d) { if(d.mood==1) console.log(d.y+" "+d.y0); return y(d.y0 + d.y); });
+        .y1(function(d) { 
+          // if(d.mood==1) console.log(d.y+" "+d.y0);
+         return y(d.y0 + d.y); });
 
 
     // function to load data and draw the Streamgraph
@@ -947,6 +951,7 @@
 
   // major flow of functions
   chart("dataLee_sum.csv");
+  // chart("dataCrystal_sum.csv");
   drawEle();
   if(!isPlayed)
     setTimeout(function(){
