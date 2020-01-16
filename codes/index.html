@@ -11,7 +11,7 @@
   }
 
   .arc text {
-    font: 10px Circular Std;
+    font: 10px Sans-serif;
     text-anchor: middle;
   }
 
@@ -116,14 +116,15 @@
 
 
   // color code computation using hsl model
-  var color_array = [];
-  for (var j =1; j<=8; j++){
-    var h = j/8 + 0.04-0.125; //0.75
-    var s = 0.78;
-    var i = 0.58;
-    var rgb = hslToRgb(h,s,i);
-    color_array[j-1] = rgbToHex(rgb[0],rgb[1],rgb[2]);
-  }
+  var color_array = ["#FFA726", "#FFD54F", "#CDDC39", "#4DB6AC", "#4FC3F7", "#1E88E5", "#9575CD", "#E57373"];
+  // var color_array = [];
+  // for (var j =1; j<=8; j++){
+  //   var h = j/8 + 0.04-0.125; //0.75
+  //   var s = 0.78;
+  //   var i = 0.58;
+  //   var rgb = hslToRgb(h,s,i);
+  //   color_array[j-1] = rgbToHex(rgb[0],rgb[1],rgb[2]);
+  // }
 
   function componentToHex(c) {
     var hex = c.toString(16);
@@ -139,18 +140,17 @@
   }
 
   // add subtle difference in color coding for consecutive bubbles 
-  function randomcolor(mood,time){
-    var s = 0.78*(1+Math.pow(-1,Math.floor(time/4))*time%3/40);
-    var i = 0.58*(1+Math.pow(-1,Math.floor(time/3))*time%4/30);
-    var rgb = hslToRgb(mood/8 + 0.04 - 0.125,s,i);
-    var thiscolor = rgbToHex(rgb[0],rgb[1],rgb[2]);
-    return thiscolor;
-  }
-
+  // function randomcolor(mood,time){
+  //   var s = 0.78*(1+Math.pow(-1,Math.floor(time/4))*time%3/40);
+  //   var i = 0.58*(1+Math.pow(-1,Math.floor(time/3))*time%4/30);
+  //   var rgb = hslToRgb(mood/8 + 0.04 - 0.125,s,i);
+  //   var thiscolor = rgbToHex(rgb[0],rgb[1],rgb[2]);
+  //   return thiscolor;
+  // }
 
   // define the global parameters/functions that are called by drawings & animations
   var x = d3.scale.linear()
-      .range([15, 277]);
+      .range([15, 510]);//277
 
   var y = d3.scale.linear()
       .range([345,750]);
@@ -277,7 +277,8 @@
     }
 
     // load Lee's data
-    d3.csv("dataLee.csv", function(d) {
+    d3.csv("dataJeeSoo.csv", function(d) {
+    // d3.csv("dataLee.csv", function(d) {
     // d3.csv("dataCrystal.csv", function(d) {
       return d;
     }, function(error, data) {
@@ -309,7 +310,7 @@
         tx = cal_X(timestamp, data_temp.day);
         ty = cal_Y(data_temp.mood, data_temp.meal);
 
-        console.log(data_temp.day +", "+data_temp.meal);
+        // console.log(data_temp.day +", "+data_temp.meal);
         if (error) throw error;
 
         // draw the bubbles
@@ -366,13 +367,17 @@
 
         // append the textures on bubbles if needed
         arc.append("path")
-          .attr("class",function(d){return "texture-"+d.data.mood;})
+          .attr("class",function(d){
+            console.log("texture-"+d.data.mood);
+            return "texture-"+d.data.mood;})
           .attr("d", path)
           .attr("stroke", function(d) {
-            return randomcolor(d.data.mood,timestamp)
+            return color(d.data.mood);
+            // return randomcolor(d.data.mood,timestamp)
           })
           .attr("fill", function(d) {
-            return randomcolor(d.data.mood,timestamp)
+            return color(d.data.mood);
+            // return randomcolor(d.data.mood,timestamp)
           });
 
         timestamp ++;
@@ -503,7 +508,10 @@
         .attr("transform", transform)
         .style("font-size","0.5px")
         .style("opacity",0)
-        .attr("fill",function(){return color(data.mood);})
+        .attr("fill",function(){
+          return color(data.mood);
+          // return color(data.mood);
+        })
         .text(function(){return keyword.split("-")[i]});
 
         d3.selectAll(".tags")
@@ -560,7 +568,6 @@
 
           // call different glyph according to the component
           switch(d.data.nutrition){
-
             case 'Carbs':
               // glyph_s = Math.sqrt(d.data.number/Total)*scaler/3.2;
               // glyph_s = d.data.number/Total*scaler;
@@ -781,10 +788,12 @@
         .enter().append("path")
           .attr("class", "layer")
           .attr("d", function(d) { return area(d.values); })
-          .style("fill", function(d) {return color(d.key); })
+          .style("fill", function(d) {
+            return color(d.key);
+          })
           .on("mouseover",function(d){
             // draw the Stacked Rose Map with the selected mood category highlighted
-            drawStack(d.key);
+            // drawStack(d.key);
 
           // if previous rose did not vanished yet, remove it
           // possible if the river is too close to the rose (distance < radius area)
@@ -840,8 +849,7 @@
             .duration(300)
             .attr("id","selected")
             .attr("stroke","#333")
-            .attr("fill", function(d) {
-            
+            .attr("fill", function(d) {            
             // define the textures
             var scaler = 15;
             var scaler2 = 8;
@@ -918,7 +926,7 @@
             .duration(300)
             .attr("id",null)
             .attr("stroke",function(d) {
-                return color(d.data.mood);
+                return  color(d.data.mood);
             })
             .attr("fill", function(d) {
                 return color(d.data.mood);
@@ -934,23 +942,24 @@
 
 
   // Stacked Rose Diagram
-  function drawStack(key){
-    svg.append("g")
-      .append("svg:image")
-      .attr("x",10)
-      .attr("y",345)
-      .attr("width","340px")
-      .attr("class","stack"+key)
-      // .attr("xlink:href","stack"+key+".png")
-      .style("opacity",0)
-      .transition()
-      .duration(800)
-      .style("opacity",1);
-  }
+  // function drawStack(key){
+  //   svg.append("g")
+  //     .append("svg:image")
+  //     .attr("x",10)
+  //     .attr("y",345)
+  //     .attr("width","340px")
+  //     .attr("class","stack"+key)
+  //     // .attr("xlink:href","stack"+key+".png")
+  //     .style("opacity",0)
+  //     .transition()
+  //     .duration(800)
+  //     .style("opacity",1);
+  // }
 
 
   // major flow of functions
-  chart("dataLee_sum.csv");
+  // chart("dataLee_sum.csv");
+  chart("dataJeeSoo_sum.csv");
   // chart("dataCrystal_sum.csv");
   drawEle();
   if(!isPlayed)

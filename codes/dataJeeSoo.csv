@@ -1,0 +1,45 @@
+timestamp,day,meal,mood,Calories,Fat,Fiber,Carbs,Sodium,Protein,Keyword
+1,1,1,1,751.17,54,0,155,616,54," Scrambled egg, baguette, Pepsi, tomato, cucumber, penne, turkey slides"
+2,2,3,8,640,4,6,106,1440,16,"Soba noodles, pasta, chicken terriyaki"
+3,3,2,1,654,21,3,59,385,50,"Spicy chicken curry, milk tea"
+4,3,3,2,577,18,2,243,780,42,"Vietnamese pho,chicken wing, fried softshell crab "
+5,4,1,6,371.2,36,6,87,540,11,"Coffee, biscuits"
+6,4,3,7,681.4,16,0,35,800,39,"Pizza, chicken wings"
+7,4,2,7,540,13,0,94,996,13,Sushi
+8,5,2,6,610.28,25,0,16,545,68,"Grilled pork chop, mashed potato "
+9,5,3,3,410,12,3,57,930,18,Chicken biriyani
+10,6,2,6,651,10,2,181,760,50,"chicken, vegetables, rice, coke"
+11,7,2,3,540,36,4,60,93,50,"Vietnamese pho, vermicelli"
+12,8,1,7,381,21,0,32,1098,17,Dim sum
+13,8,2,6,190,6,5,17,0,5,Smoothie
+14,8,3,2,540,18,3,69,1410,21,Spanish seafood paella
+15,9,2,6,642,12,0,115,680,20,Chicken curry
+16,9,3,5,346.06,4,0,9,80,26,"Roasted meat, alcohol"
+17,10,2,2,540,13,0,94,996,13,Sushi
+18,10,3,7,639,23,8,62,307,56,Hot pot
+19,11,2,6,639,23,8,62,307,56,Hot pot 
+20,11,3,6,469,13,0,77,450,8,Cookie
+21,12,2,2,660,15,0,102,1835,25,"Pork, rice"
+22,12,3,6,572,15,0,40,564,30,"Chicken soup, bibimbap"
+23,13,2,1,472,15,0,43,564,24,Bibimbab
+24,13,3,6,843.86,36,0,45,800,39,"Beer, chicken wings,pizza, nachos, cheese sticks"
+25,14,2,2,254,14,0,40,0,7,Bubble milk tea
+26,14,3,3,639,23,8,62,307,56,Hotpot 
+27,15,1,1,629.64,18,4,50,622,29,"Sausage, milk tea, chicken fillet, turnip cake "
+28,15,2,1,628.32,39,0,126,560,18,Ramen
+29,15,3,7,460,5,10,88,560,16,Subway sandwich
+30,16,1,6,688,36,3,58,1664,32,Egg pancake
+31,16,2,6,720,32,4,96,1320,12,"Waffle, apple"
+32,16,3,6,810,41,0,87,1110,25,Dumplings
+33,17,1,1,440,11,1,49,270,5,"Danish toast, coffee"
+34,17,2,6,788,39,6,53,1862,37,"Chicken leg, vegetables"
+35,17,3,1,874,11,1,72,760,17,"Xiaolongbao, vegetables"
+36,18,1,3,735,32,1,102,75,29,"Sandwich, fries"
+37,18,3,1,639,23,8,62,307,56,Hot pot
+38,19,2,2,993,36,0,135,3229,32,"Beef, rice, noodles, fried oysters"
+39,19,3,8,580,9,0,37,470,15,"Egg ball, shrimp, mochi"
+40,20,1,8,460.2,19,1,63,615,9,"Soy milk,youtiao sandwich"
+41,20,3,6,561,18,6,32,388,26,"Fried pork, vegetables"
+42,21,1,6,688,36,3,58,1664,32,Egg pancake
+43,22,2,6,400,18,2,58,0,10,Birthday cake
+44,22,3,1,370,23,0,26,420,14,Oyster omelet
